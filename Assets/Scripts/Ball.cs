@@ -6,7 +6,9 @@ using UnityEngine.SceneManagement;
 public class Ball : MonoBehaviour
 {
     Vector3 _initialPosition;
-    private Float _lauchPower = 500;
+    private float _lauchPower = 350;
+    private bool _hasBirdLaunched;
+    private float _timeSittingAround;
 
     private void Awake(){
         _initialPosition = transform.position;
@@ -20,13 +22,22 @@ public class Ball : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        if(transform.position.y < -4.3 || transform.position.y > 5.6 || transform.position.x < -7.8 || transform.position.x > 7.5)
+        GetComponent<LineRenderer>().SetPosition(0, transform.position);
+        GetComponent<LineRenderer>().SetPosition(1, _initialPosition);
+
+        if(_hasBirdLaunched && GetComponent<Rigidbody2D>().velocity.magnitude <= 0.15){
+            _timeSittingAround += Time.deltaTime;
+        }
+
+        if(transform.position.y < -20 || transform.position.y > 20 || transform.position.x < -20 || transform.position.x > 20 || _timeSittingAround > 3)
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         
     }
 
     private void OnMouseDown() {
         GetComponent<SpriteRenderer>().color = Color.red;
+        GetComponent<LineRenderer>().enabled = true;
+
     }
 
 
@@ -37,6 +48,10 @@ public class Ball : MonoBehaviour
 
         GetComponent<Rigidbody2D>().AddForce(direction * _lauchPower);
         GetComponent<Rigidbody2D>().gravityScale = 1;
+
+        _hasBirdLaunched = true;
+        GetComponent<LineRenderer>().enabled = false;
+
     }
 
     private void OnMouseDrag(){
